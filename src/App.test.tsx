@@ -2,8 +2,8 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import App from './App'
 
-test('renders "react-n-puzzle"', () => {
+test('renders a board', () => {
   render(<App />)
-  const linkElement = screen.getByText(/react-n-puzzle/i)
+  const linkElement = screen.getByTestId('board')
   expect(linkElement).toBeInTheDocument()
 })
