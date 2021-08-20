@@ -2,10 +2,15 @@ import React, { FC, ReactElement } from 'react'
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import Box from '@material-ui/core/Box'
 
-// components
+// Components
 import Tile from './Tile/Tile'
 
-// define css-in-js
+interface Props {
+  nrOfRows: number
+  nrOfColumns: number
+}
+
+// Define css-in-js
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {

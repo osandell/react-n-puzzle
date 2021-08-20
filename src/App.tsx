@@ -2,10 +2,10 @@ import React from 'react'
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import { CssBaseline } from '@material-ui/core'
 
-// components
+// Components
 import Board from './components/Board/Board'
 
-// define css-in-js
+// Define css-in-js
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
