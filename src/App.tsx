@@ -24,10 +24,13 @@ const useStyles = makeStyles((theme: Theme) =>
 function App() {
   const classes = useStyles()
 
+  const nrOfRows = 3
+  const nrOfColumns = 3
+
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <Board />
+      <Board nrOfRows={nrOfRows} nrOfColumns={nrOfColumns} />
     </div>
   )
 }
