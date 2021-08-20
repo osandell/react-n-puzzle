@@ -1,40 +1,22 @@
 import React, { FC, ReactElement } from 'react'
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import Box from '@material-ui/core/Box'
-import Button from '@material-ui/core/Button'
 
-interface Props {
-  value: number
-}
+// components
+import Tile from './Tile/Tile'
 
 // define css-in-js
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      minWidth: 320,
-      width: '100vw',
-      height: '100vh',
-      padding: 20,
-      background: 'lightGrey',
-    },
-    board: {
-      display: 'flex',
       flexDirection: 'column',
       background: 'orange',
-    },
-    tile: {
-      width: 100,
-      height: 100,
-      margin: 5,
-      background: 'white',
     },
   })
 )
 
-const Tile: FC<Props> = ({ value }): ReactElement => {
+const Board: FC = (): ReactElement => {
   const classes = useStyles()
 
   // a temporary test configuration of the board
@@ -52,23 +34,17 @@ const Tile: FC<Props> = ({ value }): ReactElement => {
 
     let rowTiles = []
     for (var j = 0; j < row.length; j++) {
-      rowTiles.push(
-        <Button key={j} className={classes.tile}>
-          {row[j]}
-        </Button>
-      )
+      rowTiles.push(<Tile key={j} value={row[j]} />)
     }
 
     rows.push(<Box key={i}>{rowTiles}</Box>)
   }
 
   return (
-    <div className={classes.root}>
-      <Box data-testid="board" className={classes.board}>
-        {rows}
-      </Box>
-    </div>
+    <Box data-testid="board" className={classes.root}>
+      {rows}
+    </Box>
   )
 }
 
-export default Tile
+export default Board
