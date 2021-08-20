@@ -1,7 +1,7 @@
 {
   "name": "react-n-puzzle",
   "homepage": "https://olofsandell.com/react-n-puzzle",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.12.3",
