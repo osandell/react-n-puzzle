@@ -51,6 +51,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
     "husky": "^7.0.0",
+    "lint-staged": "^11.1.2",
     "prettier": "^2.3.2"
   },
   "commitlint": {
@@ -66,5 +67,10 @@
   "prettier": {
     "semi": false,
     "singleQuote": true
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": "eslint --fix",
+    "*.{css, scss, sass}": "stylelint --fix",
+    "*.json": "prettier --write"
   }
 }
