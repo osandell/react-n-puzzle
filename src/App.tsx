@@ -2,10 +2,10 @@ import React from 'react'
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import { CssBaseline } from '@material-ui/core'
 
-// components
+// Components
 import Board from './components/Board/Board'
 
-// define css-in-js
+// Define css-in-js
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -24,10 +24,13 @@ const useStyles = makeStyles((theme: Theme) =>
 function App() {
   const classes = useStyles()
 
+  const nrOfRows = 3
+  const nrOfColumns = 3
+
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <Board />
+      <Board nrOfRows={nrOfRows} nrOfColumns={nrOfColumns} />
     </div>
   )
 }

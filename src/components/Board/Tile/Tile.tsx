@@ -6,7 +6,7 @@ interface Props {
   value: number
 }
 
-// define css-in-js
+// Define css-in-js
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {

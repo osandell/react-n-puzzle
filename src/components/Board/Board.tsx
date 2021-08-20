@@ -2,10 +2,15 @@ import React, { FC, ReactElement } from 'react'
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import Box from '@material-ui/core/Box'
 
-// components
+// Components
 import Tile from './Tile/Tile'
 
-// define css-in-js
+interface Props {
+  nrOfRows: number
+  nrOfColumns: number
+}
+
+// Define css-in-js
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -16,25 +21,19 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-const Board: FC = (): ReactElement => {
+const Board: FC<Props> = ({ nrOfRows, nrOfColumns }): ReactElement => {
   const classes = useStyles()
 
-  // a temporary test configuration of the board
-  let boardConfig = [
-    [1, 2, 3],
-    [4, 5, 6],
-    [7, 8],
-  ]
-
+  // Loop through all the coordinates of the board and generate a tile with the appropriate value
   let rows = []
-
-  // loop through every row of the board configuration and generate a box with tiles for each
-  for (var i = 0; i < boardConfig.length; i++) {
-    const row = boardConfig[i]
-
+  for (var i = 0; i < nrOfRows; i++) {
     let rowTiles = []
-    for (var j = 0; j < row.length; j++) {
-      rowTiles.push(<Tile key={j} value={row[j]} />)
+    for (var j = 0; j < nrOfColumns; j++) {
+      // When we reach the last position we leave it without a tile in order for to be able to move
+      // around the pieces.
+      if (!(i === nrOfRows - 1 && j === nrOfColumns - 1)) {
+        rowTiles.push(<Tile key={j} value={i * nrOfColumns + j + 1} />)
+      }
     }
 
     rows.push(<Box key={i}>{rowTiles}</Box>)
