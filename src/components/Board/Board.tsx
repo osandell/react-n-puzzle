@@ -5,9 +5,11 @@ import Box from '@material-ui/core/Box'
 // Components
 import Tile from './Tile/Tile'
 
+// Interfaces
+import TilePosition from '../../shared/interfaces/TilePosition.interface'
 interface Props {
-  nrOfRows: number
-  nrOfColumns: number
+  boardConfig: any[]
+  handleClickTile: (position: TilePosition) => void
 }
 
 // Define css-in-js
@@ -21,27 +23,33 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-const Board: FC<Props> = ({ nrOfRows, nrOfColumns }): ReactElement => {
+const Board: FC<Props> = ({ boardConfig, handleClickTile }): ReactElement => {
   const classes = useStyles()
 
-  // Loop through all the coordinates of the board and generate a tile with the appropriate value
-  let rows = []
-  for (var i = 0; i < nrOfRows; i++) {
+  // loop through every row of the board configuration and generate a box with tiles for each
+  let board = []
+  for (let i = 0; i < boardConfig.length; i++) {
+    const row = boardConfig[i]
+
     let rowTiles = []
-    for (var j = 0; j < nrOfColumns; j++) {
-      // When we reach the last position we leave it without a tile in order for to be able to move
-      // around the pieces.
-      if (!(i === nrOfRows - 1 && j === nrOfColumns - 1)) {
-        rowTiles.push(<Tile key={j} value={i * nrOfColumns + j + 1} />)
-      }
+    for (let j = 0; j < row.length; j++) {
+      rowTiles.push(
+        <Tile
+          key={j}
+          position={{ row: i, column: j }}
+          value={row[j]}
+          onClick={(position: TilePosition) => handleClickTile(position)}
+        />
+      )
     }
 
-    rows.push(<Box key={i}>{rowTiles}</Box>)
+    board.push(<Box key={i}>{rowTiles}</Box>)
   }
 
+  // console.log(rows[3])
   return (
     <Box data-testid="board" className={classes.root}>
-      {rows}
+      {board}
     </Box>
   )
 }
