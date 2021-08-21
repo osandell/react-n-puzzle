@@ -46,7 +46,6 @@ const Board: FC<Props> = ({ boardConfig, handleClickTile }): ReactElement => {
     board.push(<Box key={i}>{rowTiles}</Box>)
   }
 
-  // console.log(rows[3])
   return (
     <Box data-testid="board" className={classes.root}>
       {board}
