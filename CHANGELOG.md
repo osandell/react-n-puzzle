@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/osandell/react-n-puzzle/compare/v1.1.0...v1.2.0) (2021-08-21)
+
+
+### Features
+
+* add functionality to move around the tiles ([4fe834e](https://github.com/osandell/react-n-puzzle/commit/4fe834e8e013585e2589b5677a82a9b795abcf06)), closes [#6](https://github.com/osandell/react-n-puzzle/issues/6)
+
 # [1.1.0](https://github.com/osandell/react-n-puzzle/compare/v1.0.0...v1.1.0) (2021-08-20)
 
 
