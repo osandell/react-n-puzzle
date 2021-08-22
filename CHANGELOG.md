@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/osandell/react-n-puzzle/compare/v1.4.0...v1.5.0) (2021-08-22)
+
+
+### Features
+
+* shuffle the board at page load time ([9affff8](https://github.com/osandell/react-n-puzzle/commit/9affff880bb3aba5c90dc891fcff37c09d23b6ab)), closes [#15](https://github.com/osandell/react-n-puzzle/issues/15)
+
 # [1.4.0](https://github.com/osandell/react-n-puzzle/compare/v1.3.0...v1.4.0) (2021-08-22)
 
 
