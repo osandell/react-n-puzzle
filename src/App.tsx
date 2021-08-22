@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+
 import {
   makeStyles,
   createStyles,
@@ -16,9 +17,11 @@ import Typography from '@material-ui/core/Typography'
 
 // Components
 import Board from './components/Board/Board'
+import AlertDialog from './components/UI/AlertDialog'
 
 // Interfaces
 import TilePosition from './shared/interfaces/TilePosition.interface'
+import AlertProps from './shared/interfaces/AlertProps.interface'
 
 // Types
 type ShuffleDirection = 'horizontal' | 'vertical'
@@ -38,6 +41,7 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       display: 'flex',
+      flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
       minWidth: 320,
@@ -45,6 +49,14 @@ const useStyles = makeStyles((theme: Theme) =>
       height: '100vh',
       padding: 20,
       background: '#333',
+    },
+    levelBox: {
+      display: 'flex',
+      justifyContent: 'center',
+      marginBottom: 100,
+    },
+    panelAndBoardContainer: {
+      display: 'flex',
     },
     controlPanel: {
       display: 'flex',
@@ -77,8 +89,8 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     boardBox: {
       display: 'flex',
-      justifyContent: 'center',
-      width: 600,
+      justifyContent: 'flex-end',
+      width: 500,
     },
     typography: {
       userSelect: 'none',
@@ -86,17 +98,27 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
+// Global constants
+const MIN_NR_OF_ROWS = 2
+const MAX_NR_OF_ROWS = 4
+const MIN_NR_OF_COLUMNS = 2
+const MAX_NR_OF_COLUMNS = 4
+const SHUFFLE_QUALITY = 4
+
 function App() {
   const classes = useStyles()
 
-  const [nrOfRows, setNrOfRows] = useState<number>(3)
-  const [nrOfColumns, setNrOfColumns] = useState<number>(3)
+  const [nrOfRows, setNrOfRows] = useState<number>(2)
+  const [nrOfColumns, setNrOfColumns] = useState<number>(2)
   const [boardConfig, setBoardConfig] = useState<any[]>([])
   const [emptySquarePosition, setEmptySquarePosition] = useState<TilePosition>({
     row: nrOfRows - 1,
     column: nrOfColumns - 1,
   })
+  const [currentLevel, setCurrentLevel] = useState<number>(1)
   const [invokeShuffle, setInvokeShuffle] = useState<boolean>(false)
+  const [alertProps, setAlertProps] = useState<AlertProps | null>(null)
+  const [hasMadeFirstMove, setHasMadeFirstMove] = useState<boolean>(false)
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////
   // This callback will be called whenever the page reloads, the user changes board size, or clicks the
@@ -145,8 +167,7 @@ function App() {
       : (shuffleDirection = 'vertical')
 
     // Calculate how many times to shuffle based on the board size.
-    const shuffleQuality = 4
-    const timesToShuffle = nrOfRows * nrOfColumns * shuffleQuality
+    const timesToShuffle = nrOfRows * nrOfColumns * SHUFFLE_QUALITY
 
     for (let i = 0; i < timesToShuffle; i++) {
       // Alternate horizontally and vertically and move a randomized amount of tiles.
@@ -277,94 +298,137 @@ function App() {
   // vertically with the empty square.
   //////////////////////////////////////////////////////////////////////////////////////////////////////////
   const handleClickTile = (clickPosition: TilePosition) => {
-    // If the tile is on the same row as the empty square we need to move horizontally.
-    if (clickPosition.row === emptySquarePosition.row) {
+    // Make sure the user clicked on a valid tile
+    if (
+      clickPosition.row === emptySquarePosition.row ||
+      clickPosition.column === emptySquarePosition.column
+    ) {
       let newBoardConfig: any[] = [...boardConfig]
       let newEmptySquarePosition: TilePosition = { ...emptySquarePosition }
 
-      // Determine if we clicked to the left or to the right of the empty square and move in
-      // correct direction.
-      if (clickPosition.column < newEmptySquarePosition.column) {
-        let tileToMove: TilePosition = {
-          row: clickPosition.row,
-          column: newEmptySquarePosition.column - 1,
-        }
-
-        while (tileToMove.column >= clickPosition.column) {
-          newBoardConfig[newEmptySquarePosition.row][
-            newEmptySquarePosition.column
-          ] = newBoardConfig[tileToMove.row][tileToMove.column]
-
-          tileToMove.column = tileToMove.column - 1
-          newEmptySquarePosition = {
-            row: newEmptySquarePosition.row,
+      // If the tile is on the same row as the empty square we need to move horizontally.
+      if (clickPosition.row === emptySquarePosition.row) {
+        // Determine if we clicked to the left or to the right of the empty square and move in
+        // correct direction.
+        if (clickPosition.column < newEmptySquarePosition.column) {
+          let tileToMove: TilePosition = {
+            row: clickPosition.row,
             column: newEmptySquarePosition.column - 1,
           }
-        }
-      } else {
-        let tileToMove: TilePosition = {
-          row: clickPosition.row,
-          column: newEmptySquarePosition.column + 1,
-        }
 
-        while (tileToMove.column <= clickPosition.column) {
-          newBoardConfig[newEmptySquarePosition.row][
-            newEmptySquarePosition.column
-          ] = newBoardConfig[tileToMove.row][tileToMove.column]
+          while (tileToMove.column >= clickPosition.column) {
+            newBoardConfig[newEmptySquarePosition.row][
+              newEmptySquarePosition.column
+            ] = newBoardConfig[tileToMove.row][tileToMove.column]
 
-          tileToMove.column = tileToMove.column + 1
-          newEmptySquarePosition = {
-            row: newEmptySquarePosition.row,
+            tileToMove.column = tileToMove.column - 1
+            newEmptySquarePosition = {
+              row: newEmptySquarePosition.row,
+              column: newEmptySquarePosition.column - 1,
+            }
+          }
+        } else {
+          let tileToMove: TilePosition = {
+            row: clickPosition.row,
             column: newEmptySquarePosition.column + 1,
+          }
+
+          while (tileToMove.column <= clickPosition.column) {
+            newBoardConfig[newEmptySquarePosition.row][
+              newEmptySquarePosition.column
+            ] = newBoardConfig[tileToMove.row][tileToMove.column]
+
+            tileToMove.column = tileToMove.column + 1
+            newEmptySquarePosition = {
+              row: newEmptySquarePosition.row,
+              column: newEmptySquarePosition.column + 1,
+            }
+          }
+        }
+
+        // If the tile is on the same column as the emptly square we need to move vertically.
+      } else if (clickPosition.column === emptySquarePosition.column) {
+        // Determine if we clicked over or under the empty square and move in correct direction.
+        if (clickPosition.row < newEmptySquarePosition.row) {
+          let tileToMove: TilePosition = {
+            row: newEmptySquarePosition.row - 1,
+            column: clickPosition.column,
+          }
+
+          while (tileToMove.row >= clickPosition.row) {
+            newBoardConfig[newEmptySquarePosition.row][
+              newEmptySquarePosition.column
+            ] = newBoardConfig[tileToMove.row][tileToMove.column]
+
+            tileToMove.row = tileToMove.row - 1
+            newEmptySquarePosition = {
+              row: newEmptySquarePosition.row - 1,
+              column: newEmptySquarePosition.column,
+            }
+          }
+        } else {
+          let tileToMove: TilePosition = {
+            row: newEmptySquarePosition.row + 1,
+            column: clickPosition.column,
+          }
+
+          while (tileToMove.row <= clickPosition.row) {
+            newBoardConfig[newEmptySquarePosition.row][
+              newEmptySquarePosition.column
+            ] = newBoardConfig[tileToMove.row][tileToMove.column]
+
+            tileToMove.row = tileToMove.row + 1
+            newEmptySquarePosition = {
+              row: newEmptySquarePosition.row + 1,
+              column: newEmptySquarePosition.column,
+            }
+          }
+        }
+      }
+      // If this is the first move of the game then set a flag in order to make sure we warn before
+      // resetting the board again.
+      !hasMadeFirstMove && setHasMadeFirstMove(true)
+
+      // Check if the user has managed to put the tiles in the right order.
+      let correctOrder = true
+
+      for (let i = 0; i < nrOfRows && correctOrder; i++) {
+        for (let j = 0; j < nrOfColumns && correctOrder; j++) {
+          // Don't check the last square for a value since it's supposed to be empty.
+          if (
+            newBoardConfig[i][j] !== i * nrOfColumns + j + 1 &&
+            !(i === nrOfRows - 1 && j === nrOfColumns - 1)
+          ) {
+            correctOrder = false
           }
         }
       }
 
-      newBoardConfig[newEmptySquarePosition.row][
-        newEmptySquarePosition.column
-      ] = null
-      setBoardConfig(newBoardConfig)
-      setEmptySquarePosition(newEmptySquarePosition)
+      if (correctOrder) {
+        // Check if this was the last level.
+        if (currentLevel === MAX_NR_OF_COLUMNS + MAX_NR_OF_ROWS - 3) {
+          setAlertProps({
+            title: 'Congratulations!',
+            description: 'You have finished the last level. Great job!!',
+            alternative2: 'Ok',
+          })
+        } else {
+          setAlertProps({
+            title: 'Congratulations!',
+            description: `You finished level ${currentLevel}. Advancing to level ${
+              currentLevel + 1
+            }.`,
+            alternative2: 'Ok',
+            alternative2Function: () => {
+              // Go to the next level by adding either a row or a column depending on which is the most scarce
+              // at the moment.
+              nrOfColumns <= nrOfRows
+                ? setNrOfColumns(nrOfColumns + 1)
+                : setNrOfRows(nrOfRows + 1)
 
-      // If the tile is on the same column as the emptly square we need to move vertically.
-    } else if (clickPosition.column === emptySquarePosition.column) {
-      let newBoardConfig: any[] = [...boardConfig]
-      let newEmptySquarePosition: TilePosition = { ...emptySquarePosition }
-
-      // Determine if we clicked over or under the empty square and move in correct direction.
-      if (clickPosition.row < newEmptySquarePosition.row) {
-        let tileToMove: TilePosition = {
-          row: newEmptySquarePosition.row - 1,
-          column: clickPosition.column,
-        }
-
-        while (tileToMove.row >= clickPosition.row) {
-          newBoardConfig[newEmptySquarePosition.row][
-            newEmptySquarePosition.column
-          ] = newBoardConfig[tileToMove.row][tileToMove.column]
-
-          tileToMove.row = tileToMove.row - 1
-          newEmptySquarePosition = {
-            row: newEmptySquarePosition.row - 1,
-            column: newEmptySquarePosition.column,
-          }
-        }
-      } else {
-        let tileToMove: TilePosition = {
-          row: newEmptySquarePosition.row + 1,
-          column: clickPosition.column,
-        }
-
-        while (tileToMove.row <= clickPosition.row) {
-          newBoardConfig[newEmptySquarePosition.row][
-            newEmptySquarePosition.column
-          ] = newBoardConfig[tileToMove.row][tileToMove.column]
-
-          tileToMove.row = tileToMove.row + 1
-          newEmptySquarePosition = {
-            row: newEmptySquarePosition.row + 1,
-            column: newEmptySquarePosition.column,
-          }
+              setCurrentLevel(currentLevel + 1)
+            },
+          })
         }
       }
 
@@ -376,97 +440,166 @@ function App() {
     }
   }
 
+  const displayWarning = (functionToRunOnAffirmation: () => void) => {
+    setAlertProps({
+      title: 'Are you sure?',
+      description: 'This will quit your current game.',
+      alternative1: 'Cancel',
+      alternative2: 'OK',
+      alternative2Function: () => {
+        functionToRunOnAffirmation()
+        setHasMadeFirstMove(false)
+      },
+    })
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // A few handlers for button clicks. We always check if the user has made a first move and if so we
+  // give a warning before resetting the board.
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////
   const handleClickShuffle = () => {
-    setInvokeShuffle(true)
+    hasMadeFirstMove
+      ? displayWarning(() => setInvokeShuffle(true))
+      : setInvokeShuffle(true)
   }
 
   const handleDecreaseNrOfRows = () => {
-    setNrOfRows(nrOfRows - 1)
+    if (hasMadeFirstMove) {
+      displayWarning(() => {
+        setNrOfRows(nrOfRows - 1)
+        setCurrentLevel(currentLevel - 1)
+      })
+    } else {
+      setNrOfRows(nrOfRows - 1)
+      setCurrentLevel(currentLevel - 1)
+    }
   }
   const handleIncreaseNrOfRows = () => {
-    setNrOfRows(nrOfRows + 1)
+    if (hasMadeFirstMove) {
+      displayWarning(() => {
+        setNrOfRows(nrOfRows + 1)
+        setCurrentLevel(currentLevel + 1)
+      })
+    } else {
+      setNrOfRows(nrOfRows + 1)
+      setCurrentLevel(currentLevel + 1)
+    }
   }
   const handleDecreaseNrOfColumns = () => {
-    setNrOfColumns(nrOfColumns - 1)
+    if (hasMadeFirstMove) {
+      displayWarning(() => {
+        setNrOfColumns(nrOfColumns - 1)
+        setCurrentLevel(currentLevel - 1)
+      })
+    } else {
+      setNrOfColumns(nrOfColumns - 1)
+      setCurrentLevel(currentLevel - 1)
+    }
   }
   const handleIncreaseNrOfColumns = () => {
-    setNrOfColumns(nrOfColumns + 1)
+    if (hasMadeFirstMove) {
+      displayWarning(() => {
+        setNrOfColumns(nrOfColumns + 1)
+        setCurrentLevel(currentLevel + 1)
+      })
+    } else {
+      setNrOfColumns(nrOfColumns + 1)
+      setCurrentLevel(currentLevel + 1)
+    }
   }
 
   return (
     <ThemeProvider theme={darkTheme}>
       <div className={classes.root}>
         <CssBaseline />
-        <Box className={classes.controlPanel}>
-          <Box className={classes.nrOfRowsOrColumnsBox}>
-            <Typography
-              className={classes.typography}
-              display="block"
-              variant="body1"
-              style={{ width: '80px' }}
-            >
-              {'Rows:'}
-            </Typography>
-            <IconButton
-              className={classes.increaseOrDecreaseButton}
-              aria-label="subtract"
-              disabled={nrOfRows === 2 ? true : false}
-              onClick={handleDecreaseNrOfRows}
-            >
-              <RemoveIcon />
-            </IconButton>
-            <span className={classes.nrOfRowsOrColumnsText}>{nrOfRows}</span>
-            <IconButton
-              className={classes.increaseOrDecreaseButton}
-              aria-label="add"
-              disabled={nrOfRows === 5 ? true : false}
-              onClick={handleIncreaseNrOfRows}
-            >
-              <AddIcon />
-            </IconButton>
-          </Box>
-          <Box className={classes.nrOfRowsOrColumnsBox}>
-            <Typography
-              className={classes.typography}
-              display="block"
-              variant="body1"
-              style={{ width: '80px' }}
-            >
-              {'Columns:'}
-            </Typography>
-            <IconButton
-              className={classes.increaseOrDecreaseButton}
-              aria-label="subtract"
-              disabled={nrOfColumns === 2 ? true : false}
-              onClick={handleDecreaseNrOfColumns}
-            >
-              <RemoveIcon />
-            </IconButton>
-            <span className={classes.nrOfRowsOrColumnsText}>{nrOfColumns}</span>
-            <IconButton
-              className={classes.increaseOrDecreaseButton}
-              aria-label="add"
-              disabled={nrOfColumns === 5 ? true : false}
-              onClick={handleIncreaseNrOfColumns}
-            >
-              <AddIcon />
-            </IconButton>
-          </Box>
-          <Button
-            className={classes.newGameButton}
-            onClick={() => handleClickShuffle()}
+        <Box className={classes.levelBox}>
+          <Typography
+            className={classes.typography}
+            display="block"
+            variant="h3"
+            color="secondary"
           >
-            shuffle
-          </Button>
+            {'Level ' + currentLevel}
+          </Typography>
         </Box>
-        <Box className={classes.boardBox}>
-          <Board
-            boardConfig={boardConfig}
-            handleClickTile={(position: TilePosition) =>
-              handleClickTile(position)
-            }
-          />
+
+        <Box className={classes.panelAndBoardContainer}>
+          <Box className={classes.controlPanel}>
+            <Box className={classes.nrOfRowsOrColumnsBox}>
+              <Typography
+                className={classes.typography}
+                display="block"
+                variant="body1"
+                style={{ width: '80px' }}
+              >
+                {'Rows:'}
+              </Typography>
+              <IconButton
+                className={classes.increaseOrDecreaseButton}
+                aria-label="subtract"
+                disabled={nrOfRows === MIN_NR_OF_ROWS ? true : false}
+                onClick={handleDecreaseNrOfRows}
+              >
+                <RemoveIcon />
+              </IconButton>
+              <span className={classes.nrOfRowsOrColumnsText}>{nrOfRows}</span>
+              <IconButton
+                className={classes.increaseOrDecreaseButton}
+                aria-label="add"
+                disabled={nrOfRows === MAX_NR_OF_ROWS ? true : false}
+                onClick={handleIncreaseNrOfRows}
+              >
+                <AddIcon />
+              </IconButton>
+            </Box>
+            <Box className={classes.nrOfRowsOrColumnsBox}>
+              <Typography
+                className={classes.typography}
+                display="block"
+                variant="body1"
+                style={{ width: '80px' }}
+              >
+                {'Columns:'}
+              </Typography>
+              <IconButton
+                className={classes.increaseOrDecreaseButton}
+                aria-label="subtract"
+                disabled={nrOfColumns === MIN_NR_OF_COLUMNS ? true : false}
+                onClick={handleDecreaseNrOfColumns}
+              >
+                <RemoveIcon />
+              </IconButton>
+              <span className={classes.nrOfRowsOrColumnsText}>
+                {nrOfColumns}
+              </span>
+              <IconButton
+                className={classes.increaseOrDecreaseButton}
+                aria-label="add"
+                disabled={nrOfColumns === MAX_NR_OF_COLUMNS ? true : false}
+                onClick={handleIncreaseNrOfColumns}
+              >
+                <AddIcon />
+              </IconButton>
+            </Box>
+            <Button
+              className={classes.newGameButton}
+              onClick={() => handleClickShuffle()}
+            >
+              shuffle
+            </Button>
+          </Box>
+          <Box className={classes.boardBox}>
+            <Board
+              boardConfig={boardConfig}
+              handleClickTile={(position: TilePosition) =>
+                handleClickTile(position)
+              }
+            />
+          </Box>
         </Box>
+        {alertProps !== null && (
+          <AlertDialog content={alertProps} setContent={setAlertProps} />
+        )}
       </div>
     </ThemeProvider>
   )
