@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/osandell/react-n-puzzle/compare/v1.6.0...v1.7.0) (2021-08-22)
+
+
+### Features
+
+* make GUI responsive ([c291442](https://github.com/osandell/react-n-puzzle/commit/c29144270e159bd890f91bdf98d53866eeef7fba)), closes [#16](https://github.com/osandell/react-n-puzzle/issues/16)
+
 # [1.6.0](https://github.com/osandell/react-n-puzzle/compare/v1.5.0...v1.6.0) (2021-08-22)
 
 
