@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.js": "/react-n-puzzle/static/js/main.c0dae3ba.chunk.js",
-    "main.js.map": "/react-n-puzzle/static/js/main.c0dae3ba.chunk.js.map",
+    "main.js": "/react-n-puzzle/static/js/main.d48ffe5d.chunk.js",
+    "main.js.map": "/react-n-puzzle/static/js/main.d48ffe5d.chunk.js.map",
     "runtime-main.js": "/react-n-puzzle/static/js/runtime-main.8f8190c3.js",
     "runtime-main.js.map": "/react-n-puzzle/static/js/runtime-main.8f8190c3.js.map",
     "static/js/2.d4772bee.chunk.js": "/react-n-puzzle/static/js/2.d4772bee.chunk.js",
@@ -14,6 +14,6 @@
   "entrypoints": [
     "static/js/runtime-main.8f8190c3.js",
     "static/js/2.d4772bee.chunk.js",
-    "static/js/main.c0dae3ba.chunk.js"
+    "static/js/main.d48ffe5d.chunk.js"
   ]
 }
