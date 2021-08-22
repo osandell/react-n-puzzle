@@ -28,6 +28,9 @@ const darkTheme = createTheme({
   palette: {
     type: 'dark',
   },
+  typography: {
+    fontFamily: `"Open Sans", sans-serif`,
+  },
 })
 
 // Define css-in-js.
@@ -67,6 +70,7 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: 5,
       fontSize: 16,
       margin: '0 10px 0 10px',
+      userSelect: 'none',
     },
     increaseOrDecreaseButton: {
       backgroundColor: '#4a4a4a',
@@ -75,6 +79,9 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       justifyContent: 'center',
       width: 600,
+    },
+    typography: {
+      userSelect: 'none',
     },
   })
 )
@@ -375,6 +382,7 @@ function App() {
         <Box className={classes.controlPanel}>
           <Box className={classes.nrOfRowsOrColumnsBox}>
             <Typography
+              className={classes.typography}
               display="block"
               variant="body1"
               style={{ width: '80px' }}
@@ -401,6 +409,7 @@ function App() {
           </Box>
           <Box className={classes.nrOfRowsOrColumnsBox}>
             <Typography
+              className={classes.typography}
               display="block"
               variant="body1"
               style={{ width: '80px' }}
