@@ -1,3 +1,10 @@
+## [1.7.2](https://github.com/osandell/react-n-puzzle/compare/v1.7.1...v1.7.2) (2021-08-22)
+
+
+### Bug Fixes
+
+* **gui:** fix issues with buttons becoming transparent ([5703f5f](https://github.com/osandell/react-n-puzzle/commit/5703f5f27c828c6aecc7cfc9a4fe43dfee27d22d)), closes [#26](https://github.com/osandell/react-n-puzzle/issues/26)
+
 ## [1.7.1](https://github.com/osandell/react-n-puzzle/compare/v1.7.0...v1.7.1) (2021-08-22)
 
 
