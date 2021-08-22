@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/osandell/react-n-puzzle/compare/v1.7.0...v1.7.1) (2021-08-22)
+
+
+### Bug Fixes
+
+* **gui:** make app responsive to mobile phone in landscape mode ([73b8ef0](https://github.com/osandell/react-n-puzzle/commit/73b8ef0bddfe320494e57d2fbedfa0374b969771)), closes [#23](https://github.com/osandell/react-n-puzzle/issues/23)
+
 # [1.7.0](https://github.com/osandell/react-n-puzzle/compare/v1.6.0...v1.7.0) (2021-08-22)
 
 
