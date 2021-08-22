@@ -16,7 +16,7 @@ interface Props {
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      display: 'flex',
+      display: 'inline-flex',
       flexDirection: 'column',
       background: 'orange',
     },

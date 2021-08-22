@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from 'react'
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
+import {
+  makeStyles,
+  createStyles,
+  Theme,
+  createTheme,
+  ThemeProvider,
+} from '@material-ui/core/styles'
 import { CssBaseline } from '@material-ui/core'
 import Box from '@material-ui/core/Box'
 import Button from '@material-ui/core/Button'
+import IconButton from '@material-ui/core/IconButton'
+import AddIcon from '@material-ui/icons/Add'
+import RemoveIcon from '@material-ui/icons/Remove'
+import Typography from '@material-ui/core/Typography'
 
 // Components
 import Board from './components/Board/Board'
@@ -12,6 +22,13 @@ import TilePosition from './shared/interfaces/TilePosition.interface'
 
 // Types
 type ShuffleDirection = 'horizontal' | 'vertical'
+
+// Create a dark theme.
+const darkTheme = createTheme({
+  palette: {
+    type: 'dark',
+  },
+})
 
 // Define css-in-js.
 const useStyles = makeStyles((theme: Theme) =>
@@ -28,12 +45,36 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     controlPanel: {
       display: 'flex',
+      flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
       marginRight: 50,
     },
-    button: {
-      backgroundColor: '#777',
+    newGameButton: {
+      marginTop: 60,
+      backgroundColor: '#4a4a4a',
+    },
+    nrOfRowsOrColumnsBox: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: 20,
+    },
+    nrOfRowsOrColumnsText: {
+      display: 'flex',
+      alignItems: 'center',
+      borderRadius: 8,
+      padding: 5,
+      fontSize: 16,
+      margin: '0 10px 0 10px',
+    },
+    increaseOrDecreaseButton: {
+      backgroundColor: '#4a4a4a',
+    },
+    boardBox: {
+      display: 'flex',
+      justifyContent: 'center',
+      width: 600,
     },
   })
 )
@@ -41,8 +82,8 @@ const useStyles = makeStyles((theme: Theme) =>
 function App() {
   const classes = useStyles()
 
-  const nrOfRows = 3
-  const nrOfColumns = 3
+  const [nrOfRows, setNrOfRows] = useState<number>(3)
+  const [nrOfColumns, setNrOfColumns] = useState<number>(3)
 
   const [boardConfig, setBoardConfig] = useState<any[]>([])
   const [emptySquarePosition, setEmptySquarePosition] = useState<TilePosition>({
@@ -67,6 +108,9 @@ function App() {
         }
       }
     }
+
+    // Store the position of the empty square so we don't need to recalculate it every time
+    setEmptySquarePosition({ row: nrOfRows - 1, column: nrOfColumns - 1 })
 
     setBoardConfig(newBoardConfig)
   }, [setBoardConfig, nrOfRows, nrOfColumns])
@@ -311,19 +355,93 @@ function App() {
     setEmptySquarePosition(newEmptySquarePosition)
   }
 
+  const handleDecreaseNrOfRows = () => {
+    setNrOfRows(nrOfRows - 1)
+  }
+  const handleIncreaseNrOfRows = () => {
+    setNrOfRows(nrOfRows + 1)
+  }
+  const handleDecreaseNrOfColumns = () => {
+    setNrOfColumns(nrOfColumns - 1)
+  }
+  const handleIncreaseNrOfColumns = () => {
+    setNrOfColumns(nrOfColumns + 1)
+  }
+
   return (
-    <div className={classes.root}>
-      <CssBaseline />
-      <Box className={classes.controlPanel}>
-        <Button className={classes.button} onClick={() => handleShuffle()}>
-          Shuffle
-        </Button>
-      </Box>
-      <Board
-        boardConfig={boardConfig}
-        handleClickTile={(position: TilePosition) => handleClickTile(position)}
-      />
-    </div>
+    <ThemeProvider theme={darkTheme}>
+      <div className={classes.root}>
+        <CssBaseline />
+        <Box className={classes.controlPanel}>
+          <Box className={classes.nrOfRowsOrColumnsBox}>
+            <Typography
+              display="block"
+              variant="body1"
+              style={{ width: '80px' }}
+            >
+              {'Rows:'}
+            </Typography>
+            <IconButton
+              className={classes.increaseOrDecreaseButton}
+              aria-label="subtract"
+              disabled={nrOfRows === 2 ? true : false}
+              onClick={handleDecreaseNrOfRows}
+            >
+              <RemoveIcon />
+            </IconButton>
+            <span className={classes.nrOfRowsOrColumnsText}>{nrOfRows}</span>
+            <IconButton
+              className={classes.increaseOrDecreaseButton}
+              aria-label="add"
+              disabled={nrOfRows === 5 ? true : false}
+              onClick={handleIncreaseNrOfRows}
+            >
+              <AddIcon />
+            </IconButton>
+          </Box>
+          <Box className={classes.nrOfRowsOrColumnsBox}>
+            <Typography
+              display="block"
+              variant="body1"
+              style={{ width: '80px' }}
+            >
+              {'Columns:'}
+            </Typography>
+            <IconButton
+              className={classes.increaseOrDecreaseButton}
+              aria-label="subtract"
+              disabled={nrOfColumns === 2 ? true : false}
+              onClick={handleDecreaseNrOfColumns}
+            >
+              <RemoveIcon />
+            </IconButton>
+            <span className={classes.nrOfRowsOrColumnsText}>{nrOfColumns}</span>
+            <IconButton
+              className={classes.increaseOrDecreaseButton}
+              aria-label="add"
+              disabled={nrOfColumns === 5 ? true : false}
+              onClick={handleIncreaseNrOfColumns}
+            >
+              <AddIcon />
+            </IconButton>
+          </Box>
+          <Button
+            className={classes.newGameButton}
+            onClick={() => handleShuffle()}
+          >
+            shuffle
+          </Button>
+        </Box>
+        <Box className={classes.boardBox}>
+          <Board
+            boardConfig={boardConfig}
+            handleClickTile={(position: TilePosition) =>
+              handleClickTile(position)
+            }
+          />
+        </Box>
+      </div>
+    </ThemeProvider>
   )
 }
 
