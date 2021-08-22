@@ -109,7 +109,18 @@ const useStyles = makeStyles((theme: Theme) =>
     shuffleButton: {
       marginTop: 20,
       marginBottom: 40,
+
+      // There is a bug in Material UI causing buttons to become transparent after clicking them
+      // on mobile devices. Below code makes sure we have control over the colors.
       backgroundColor: '#4a4a4a',
+      '&:hover': {
+        backgroundColor: '#4a4a4a',
+      },
+      '@media (hover: hover)': {
+        '&:hover': {
+          backgroundColor: '#0000000a',
+        },
+      },
     },
     nrOfRowsOrColumnsBox: {
       display: 'flex',
@@ -133,7 +144,24 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     increaseOrDecreaseButton: {
       backgroundColor: '#4a4a4a',
+      '&:hover': {
+        backgroundColor: '#4a4a4a',
+      },
+      '@media (hover: hover)': {
+        '&:hover': {
+          backgroundColor: '#0000000a',
+        },
+      },
     },
+    // The following 2 keys constitutes a "hack" to take control over the background color of
+    // disabled buttons in Material UI. Here we don't want them to get a transparent background
+    // but instead stay colored grey.
+    rootButton: {
+      '&$disabled': {
+        backgroundColor: '#4a4a4a',
+      },
+    },
+    disabled: {},
     boardBox: {
       display: 'flex',
       justifyContent: 'center',
@@ -584,6 +612,10 @@ function App() {
                 </Typography>
                 <IconButton
                   className={classes.increaseOrDecreaseButton}
+                  classes={{
+                    root: classes.rootButton,
+                    disabled: classes.disabled,
+                  }}
                   aria-label="subtract"
                   disabled={nrOfRows === MIN_NR_OF_ROWS ? true : false}
                   onClick={handleDecreaseNrOfRows}
@@ -595,6 +627,10 @@ function App() {
                 </span>
                 <IconButton
                   className={classes.increaseOrDecreaseButton}
+                  classes={{
+                    root: classes.rootButton,
+                    disabled: classes.disabled,
+                  }}
                   aria-label="add"
                   disabled={nrOfRows === MAX_NR_OF_ROWS ? true : false}
                   onClick={handleIncreaseNrOfRows}
@@ -613,6 +649,10 @@ function App() {
                 </Typography>
                 <IconButton
                   className={classes.increaseOrDecreaseButton}
+                  classes={{
+                    root: classes.rootButton,
+                    disabled: classes.disabled,
+                  }}
                   aria-label="subtract"
                   disabled={nrOfColumns === MIN_NR_OF_COLUMNS ? true : false}
                   onClick={handleDecreaseNrOfColumns}
@@ -624,6 +664,10 @@ function App() {
                 </span>
                 <IconButton
                   className={classes.increaseOrDecreaseButton}
+                  classes={{
+                    root: classes.rootButton,
+                    disabled: classes.disabled,
+                  }}
                   aria-label="add"
                   disabled={nrOfColumns === MAX_NR_OF_COLUMNS ? true : false}
                   onClick={handleIncreaseNrOfColumns}
