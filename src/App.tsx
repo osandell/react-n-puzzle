@@ -52,10 +52,14 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     contentContainer: {
       width: '100vw',
-      height: 504,
+      height: 5304,
 
       [`${theme.breakpoints.up('md')}`]: {
         width: 594,
+        height: 314,
+      },
+      [`${theme.breakpoints.down('sm')} and (orientation: landscape)`]: {
+        width: 540,
         height: 314,
       },
     },
@@ -67,6 +71,9 @@ const useStyles = makeStyles((theme: Theme) =>
       [`${theme.breakpoints.up('md')}`]: {
         justifyContent: 'flex-start',
       },
+      [`${theme.breakpoints.down('sm')} and (orientation: landscape)`]: {
+        justifyContent: 'flex-start',
+      },
     },
     panelAndBoardContainer: {
       display: 'flex',
@@ -74,6 +81,11 @@ const useStyles = makeStyles((theme: Theme) =>
       flexDirection: 'column',
 
       [`${theme.breakpoints.up('md')}`]: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        justifyContent: 'space-between',
+      },
+      [`${theme.breakpoints.down('sm')} and (orientation: landscape)`]: {
         flexDirection: 'row',
         alignItems: 'flex-start',
         justifyContent: 'space-between',
@@ -89,6 +101,10 @@ const useStyles = makeStyles((theme: Theme) =>
         alignItems: 'flex-start',
         marginRight: 50,
       },
+      [`${theme.breakpoints.down('sm')} and (orientation: landscape)`]: {
+        alignItems: 'flex-start',
+        marginRight: 20,
+      },
     },
     shuffleButton: {
       marginTop: 20,
@@ -101,6 +117,10 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: 'space-between',
       width: 272,
       marginBottom: 20,
+
+      [`${theme.breakpoints.down('sm')} and (orientation: landscape)`]: {
+        width: 232,
+      },
     },
     nrOfRowsOrColumnsText: {
       display: 'flex',
