@@ -14,9 +14,9 @@ interface Props {
 const useStyles = makeStyles<Theme, Props>((theme: Theme) =>
   createStyles({
     root: (props) => ({
-      width: 100,
-      height: 100,
-      margin: 5,
+      width: 45,
+      height: 50,
+      margin: 2,
       backgroundColor: '#444',
       '&:hover': {
         backgroundColor: '#00000090',
