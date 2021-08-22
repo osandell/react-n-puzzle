@@ -1,3 +1,4 @@
+![WebApp](../media/react-n-puzzle_screenshot.png?raw=true)
 # react-n-puzzle
 
 <table>
@@ -9,6 +10,10 @@ In this version the user is able to choose the size of the board.
 </td>
 </tr>
 </table>
+
+## Demo
+
+Here is a live demo of the app: https://olofsandell.com/react-n-puzzle
 
 ## Built with
 
