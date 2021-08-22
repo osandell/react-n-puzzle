@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/osandell/react-n-puzzle/compare/v1.5.0...v1.6.0) (2021-08-22)
+
+
+### Features
+
+* add a modal ([46788f2](https://github.com/osandell/react-n-puzzle/commit/46788f21065e7baa0af0a97a77b00624ad1998a6)), closes [#17](https://github.com/osandell/react-n-puzzle/issues/17)
+
 # [1.5.0](https://github.com/osandell/react-n-puzzle/compare/v1.4.0...v1.5.0) (2021-08-22)
 
 
