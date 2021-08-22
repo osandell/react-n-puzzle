@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/osandell/react-n-puzzle/compare/v1.2.0...v1.3.0) (2021-08-22)
+
+
+### Features
+
+* add a shuffle function ([8bbc00f](https://github.com/osandell/react-n-puzzle/commit/8bbc00f54a80ec5b6eb060f47a32332ee98b7709)), closes [#7](https://github.com/osandell/react-n-puzzle/issues/7)
+
 # [1.2.0](https://github.com/osandell/react-n-puzzle/compare/v1.1.0...v1.2.0) (2021-08-21)
 
 
