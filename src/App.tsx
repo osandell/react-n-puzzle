@@ -50,29 +50,56 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: 20,
       background: '#333',
     },
+    contentContainer: {
+      width: '100vw',
+      height: 504,
+
+      [`${theme.breakpoints.up('md')}`]: {
+        width: 594,
+        height: 314,
+      },
+    },
     levelBox: {
-      display: 'flex',
       justifyContent: 'center',
-      marginBottom: 100,
+      display: 'flex',
+      marginBottom: 40,
+
+      [`${theme.breakpoints.up('md')}`]: {
+        justifyContent: 'flex-start',
+      },
     },
     panelAndBoardContainer: {
       display: 'flex',
+      alignItems: 'center',
+      flexDirection: 'column',
+
+      [`${theme.breakpoints.up('md')}`]: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        justifyContent: 'space-between',
+      },
     },
     controlPanel: {
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
-      marginRight: 50,
+
+      [`${theme.breakpoints.up('md')}`]: {
+        alignItems: 'flex-start',
+        marginRight: 50,
+      },
     },
-    newGameButton: {
-      marginTop: 60,
+    shuffleButton: {
+      marginTop: 20,
+      marginBottom: 40,
       backgroundColor: '#4a4a4a',
     },
     nrOfRowsOrColumnsBox: {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
+      width: 272,
       marginBottom: 20,
     },
     nrOfRowsOrColumnsText: {
@@ -89,8 +116,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     boardBox: {
       display: 'flex',
-      justifyContent: 'flex-end',
-      width: 500,
+      justifyContent: 'center',
     },
     typography: {
       userSelect: 'none',
@@ -510,97 +536,102 @@ function App() {
 
   return (
     <ThemeProvider theme={darkTheme}>
-      <div className={classes.root}>
-        <CssBaseline />
-        <Box className={classes.levelBox}>
-          <Typography
-            className={classes.typography}
-            display="block"
-            variant="h3"
-            color="secondary"
-          >
-            {'Level ' + currentLevel}
-          </Typography>
-        </Box>
+      <CssBaseline />
 
-        <Box className={classes.panelAndBoardContainer}>
-          <Box className={classes.controlPanel}>
-            <Box className={classes.nrOfRowsOrColumnsBox}>
-              <Typography
-                className={classes.typography}
-                display="block"
-                variant="body1"
-                style={{ width: '80px' }}
-              >
-                {'Rows:'}
-              </Typography>
-              <IconButton
-                className={classes.increaseOrDecreaseButton}
-                aria-label="subtract"
-                disabled={nrOfRows === MIN_NR_OF_ROWS ? true : false}
-                onClick={handleDecreaseNrOfRows}
-              >
-                <RemoveIcon />
-              </IconButton>
-              <span className={classes.nrOfRowsOrColumnsText}>{nrOfRows}</span>
-              <IconButton
-                className={classes.increaseOrDecreaseButton}
-                aria-label="add"
-                disabled={nrOfRows === MAX_NR_OF_ROWS ? true : false}
-                onClick={handleIncreaseNrOfRows}
-              >
-                <AddIcon />
-              </IconButton>
-            </Box>
-            <Box className={classes.nrOfRowsOrColumnsBox}>
-              <Typography
-                className={classes.typography}
-                display="block"
-                variant="body1"
-                style={{ width: '80px' }}
-              >
-                {'Columns:'}
-              </Typography>
-              <IconButton
-                className={classes.increaseOrDecreaseButton}
-                aria-label="subtract"
-                disabled={nrOfColumns === MIN_NR_OF_COLUMNS ? true : false}
-                onClick={handleDecreaseNrOfColumns}
-              >
-                <RemoveIcon />
-              </IconButton>
-              <span className={classes.nrOfRowsOrColumnsText}>
-                {nrOfColumns}
-              </span>
-              <IconButton
-                className={classes.increaseOrDecreaseButton}
-                aria-label="add"
-                disabled={nrOfColumns === MAX_NR_OF_COLUMNS ? true : false}
-                onClick={handleIncreaseNrOfColumns}
-              >
-                <AddIcon />
-              </IconButton>
-            </Box>
-            <Button
-              className={classes.newGameButton}
-              onClick={() => handleClickShuffle()}
+      <Box className={classes.root}>
+        <Box className={classes.contentContainer}>
+          <Box className={classes.levelBox}>
+            <Typography
+              className={classes.typography}
+              display="block"
+              variant="h4"
+              color="secondary"
             >
-              shuffle
-            </Button>
+              {'Level ' + currentLevel}
+            </Typography>
           </Box>
-          <Box className={classes.boardBox}>
-            <Board
-              boardConfig={boardConfig}
-              handleClickTile={(position: TilePosition) =>
-                handleClickTile(position)
-              }
-            />
+
+          <Box className={classes.panelAndBoardContainer}>
+            <Box className={classes.controlPanel}>
+              <Box className={classes.nrOfRowsOrColumnsBox}>
+                <Typography
+                  className={classes.typography}
+                  display="block"
+                  variant="body1"
+                  style={{ width: '120px' }}
+                >
+                  {'Rows:'}
+                </Typography>
+                <IconButton
+                  className={classes.increaseOrDecreaseButton}
+                  aria-label="subtract"
+                  disabled={nrOfRows === MIN_NR_OF_ROWS ? true : false}
+                  onClick={handleDecreaseNrOfRows}
+                >
+                  <RemoveIcon />
+                </IconButton>
+                <span className={classes.nrOfRowsOrColumnsText}>
+                  {nrOfRows}
+                </span>
+                <IconButton
+                  className={classes.increaseOrDecreaseButton}
+                  aria-label="add"
+                  disabled={nrOfRows === MAX_NR_OF_ROWS ? true : false}
+                  onClick={handleIncreaseNrOfRows}
+                >
+                  <AddIcon />
+                </IconButton>
+              </Box>
+              <Box className={classes.nrOfRowsOrColumnsBox}>
+                <Typography
+                  className={classes.typography}
+                  display="block"
+                  variant="body1"
+                  style={{ width: '120px' }}
+                >
+                  {'Columns:'}
+                </Typography>
+                <IconButton
+                  className={classes.increaseOrDecreaseButton}
+                  aria-label="subtract"
+                  disabled={nrOfColumns === MIN_NR_OF_COLUMNS ? true : false}
+                  onClick={handleDecreaseNrOfColumns}
+                >
+                  <RemoveIcon />
+                </IconButton>
+                <span className={classes.nrOfRowsOrColumnsText}>
+                  {nrOfColumns}
+                </span>
+                <IconButton
+                  className={classes.increaseOrDecreaseButton}
+                  aria-label="add"
+                  disabled={nrOfColumns === MAX_NR_OF_COLUMNS ? true : false}
+                  onClick={handleIncreaseNrOfColumns}
+                >
+                  <AddIcon />
+                </IconButton>
+              </Box>
+              <Button
+                className={classes.shuffleButton}
+                onClick={() => handleClickShuffle()}
+              >
+                shuffle
+              </Button>
+            </Box>
+            <Box className={classes.boardBox}>
+              <Board
+                boardConfig={boardConfig}
+                handleClickTile={(position: TilePosition) =>
+                  handleClickTile(position)
+                }
+              />
+            </Box>
           </Box>
+          {alertProps !== null && (
+            <AlertDialog content={alertProps} setContent={setAlertProps} />
+          )}
         </Box>
-        {alertProps !== null && (
-          <AlertDialog content={alertProps} setContent={setAlertProps} />
-        )}
-      </div>
+      </Box>
     </ThemeProvider>
   )
 }

@@ -19,6 +19,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'inline-flex',
       flexDirection: 'column',
       background: 'orange',
+      borderRadius: 5,
     },
   })
 )
