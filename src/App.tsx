@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 
 import {
   makeStyles,
@@ -190,182 +190,218 @@ function App() {
     column: nrOfColumns - 1,
   })
   const [currentLevel, setCurrentLevel] = useState<number>(1)
-  const [invokeShuffle, setInvokeShuffle] = useState<boolean>(false)
   const [alertProps, setAlertProps] = useState<AlertProps | null>(null)
   const [hasMadeFirstMove, setHasMadeFirstMove] = useState<boolean>(false)
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // This callback will be called whenever the page reloads, the user changes board size, or clicks the
-  // shuffle button.
+  // Function to move one or several tiles left, right, up or down.
   //////////////////////////////////////////////////////////////////////////////////////////////////////////
-  useEffect(() => {
-    if (invokeShuffle) {
-      setInvokeShuffle(false)
-    }
+  const moveTiles = (
+    clickPosition: TilePosition,
+    newBoardConfig: any[],
+    newEmptySquarePosition: TilePosition
+  ): [any[], TilePosition] => {
+    // If the tile is on the same row as the empty square we need to move horizontally.
+    if (clickPosition.row === newEmptySquarePosition.row) {
+      // Determine if we clicked to the left or to the right of the empty square and move in
+      // correct direction.
+      if (clickPosition.column < newEmptySquarePosition.column) {
+        let tileToMove: TilePosition = {
+          row: clickPosition.row,
+          column: newEmptySquarePosition.column - 1,
+        }
 
-    //////////////////////////////
-    // Initiate the board.
-    //////////////////////////////
-    let newBoardConfig: any[] = []
+        while (tileToMove.column >= clickPosition.column) {
+          newBoardConfig[newEmptySquarePosition.row][
+            newEmptySquarePosition.column
+          ] = newBoardConfig[tileToMove.row][tileToMove.column]
 
-    for (let i = 0; i < nrOfRows; i++) {
-      newBoardConfig.push([])
-      for (let j = 0; j < nrOfColumns; j++) {
-        // When we reach the last position we leave it without a value so that it becomes an empty
-        // square allowing us to move around the pieces.
-        if (i === nrOfRows - 1 && j === nrOfColumns - 1) {
-          newBoardConfig[i].push(null)
-        } else {
-          newBoardConfig[i].push(i * nrOfColumns + j + 1)
+          tileToMove.column = tileToMove.column - 1
+          newEmptySquarePosition = {
+            row: newEmptySquarePosition.row,
+            column: newEmptySquarePosition.column - 1,
+          }
+        }
+      } else {
+        let tileToMove: TilePosition = {
+          row: clickPosition.row,
+          column: newEmptySquarePosition.column + 1,
+        }
+
+        while (tileToMove.column <= clickPosition.column) {
+          newBoardConfig[newEmptySquarePosition.row][
+            newEmptySquarePosition.column
+          ] = newBoardConfig[tileToMove.row][tileToMove.column]
+
+          tileToMove.column = tileToMove.column + 1
+          newEmptySquarePosition = {
+            row: newEmptySquarePosition.row,
+            column: newEmptySquarePosition.column + 1,
+          }
+        }
+      }
+
+      // If the tile is on the same column as the emptly square we need to move vertically.
+    } else if (clickPosition.column === newEmptySquarePosition.column) {
+      // Determine if we clicked over or under the empty square and move in correct direction.
+      if (clickPosition.row < newEmptySquarePosition.row) {
+        let tileToMove: TilePosition = {
+          row: newEmptySquarePosition.row - 1,
+          column: clickPosition.column,
+        }
+
+        while (tileToMove.row >= clickPosition.row) {
+          newBoardConfig[newEmptySquarePosition.row][
+            newEmptySquarePosition.column
+          ] = newBoardConfig[tileToMove.row][tileToMove.column]
+
+          tileToMove.row = tileToMove.row - 1
+          newEmptySquarePosition = {
+            row: newEmptySquarePosition.row - 1,
+            column: newEmptySquarePosition.column,
+          }
+        }
+      } else {
+        let tileToMove: TilePosition = {
+          row: newEmptySquarePosition.row + 1,
+          column: clickPosition.column,
+        }
+
+        while (tileToMove.row <= clickPosition.row) {
+          newBoardConfig[newEmptySquarePosition.row][
+            newEmptySquarePosition.column
+          ] = newBoardConfig[tileToMove.row][tileToMove.column]
+
+          tileToMove.row = tileToMove.row + 1
+          newEmptySquarePosition = {
+            row: newEmptySquarePosition.row + 1,
+            column: newEmptySquarePosition.column,
+          }
         }
       }
     }
 
-    //////////////////////////////
-    // Shuffle the tiles.
-    //////////////////////////////
+    newBoardConfig[newEmptySquarePosition.row][newEmptySquarePosition.column] =
+      null
+    return [newBoardConfig, newEmptySquarePosition]
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // This function shuffles the tiles around by making an amount of "virtual mouseclicks" on valid
+  // tiles. We make it a useCallback function in order to prevent useEffect to get triggered every
+  // time it's created causing an infinite loop.
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////
+  const shuffleTiles = useCallback(
+    (newBoardConfig: any[], newEmptySquarePosition: TilePosition) => {
+      // This variable represents a "virtual" click position that is generated for each shuffle iteration.
+      let clickPosition
+
+      // Randomize whether to start moving tiles horizontally or vertically.
+      let shuffleDirection: ShuffleDirection
+      Math.random() < 0.5
+        ? (shuffleDirection = 'horizontal')
+        : (shuffleDirection = 'vertical')
+
+      // Calculate how many times to shuffle based on the board size.
+      const timesToShuffle = nrOfRows * nrOfColumns * SHUFFLE_QUALITY
+
+      for (let i = 0; i < timesToShuffle; i++) {
+        // Alternate horizontally and vertically and move a randomized amount of tiles.
+        if (shuffleDirection === 'horizontal') {
+          // Now we need to pick a random tile on the row with the empty square. We do this by
+          // randomizing columns until we find one that doesn't include the empty square.
+          let foundValidColumn = false
+          let columnOfTileToMove = 0
+          while (!foundValidColumn) {
+            let randomColumn = Math.round(Math.random() * (nrOfColumns - 1))
+            if (!(randomColumn === newEmptySquarePosition.column)) {
+              columnOfTileToMove = randomColumn
+              foundValidColumn = true
+            }
+          }
+
+          // Generate a position on the board to make a "virtual" click.
+          clickPosition = {
+            row: newEmptySquarePosition.row,
+            column: columnOfTileToMove,
+          }
+
+          // Move the tiles and get the updated board config + empty square position
+          ;[newBoardConfig, newEmptySquarePosition] = moveTiles(
+            clickPosition,
+            newBoardConfig,
+            newEmptySquarePosition
+          )
+
+          // Change direction of tile movement for next round
+          shuffleDirection = 'vertical'
+        } else if (shuffleDirection === 'vertical') {
+          let foundValidRow = false
+          let rowOfTileToMove = 0
+          while (!foundValidRow) {
+            let randomRow = Math.round(Math.random() * (nrOfRows - 1))
+            if (!(randomRow === newEmptySquarePosition.row)) {
+              rowOfTileToMove = randomRow
+              foundValidRow = true
+            }
+          }
+
+          clickPosition = {
+            row: rowOfTileToMove,
+            column: newEmptySquarePosition.column,
+          }
+
+          // Move the tiles and get the updated board config + empty square position
+          ;[newBoardConfig, newEmptySquarePosition] = moveTiles(
+            clickPosition,
+            newBoardConfig,
+            newEmptySquarePosition
+          )
+
+          shuffleDirection = 'horizontal'
+        }
+      }
+
+      newBoardConfig[newEmptySquarePosition.row][
+        newEmptySquarePosition.column
+      ] = null
+
+      // return [newBoardConfig, newEmptySquarePosition]
+      setBoardConfig(newBoardConfig)
+      setEmptySquarePosition(newEmptySquarePosition)
+    },
+    [nrOfColumns, nrOfRows]
+  )
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // This function will be called whenever the page reloads or the user changes board size.
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////
+  useEffect(() => {
+    // Initiate the board.
+    let initialBoardConfig: any[] = []
+
+    for (let i = 0; i < nrOfRows; i++) {
+      initialBoardConfig.push([])
+      for (let j = 0; j < nrOfColumns; j++) {
+        // When we reach the last position set it to null so that it becomes an empty
+        // square allowing us to move around the pieces.
+        if (i === nrOfRows - 1 && j === nrOfColumns - 1) {
+          initialBoardConfig[i].push(null)
+        } else {
+          initialBoardConfig[i].push(i * nrOfColumns + j + 1)
+        }
+      }
+    }
 
     // Store the position of the empty square so we can keep track of it while shuffling
-    let newEmptySquarePosition: TilePosition = {
+    let initialEmptySquarePosition: TilePosition = {
       row: nrOfRows - 1,
       column: nrOfColumns - 1,
     }
 
-    // This variable represents a "virtual" click position that is generated for each shuffle iteration.
-    let clickPosition
-
-    // Randomize whether to start moving tiles horizontally or vertically.
-    let shuffleDirection: ShuffleDirection
-    Math.random() < 0.5
-      ? (shuffleDirection = 'horizontal')
-      : (shuffleDirection = 'vertical')
-
-    // Calculate how many times to shuffle based on the board size.
-    const timesToShuffle = nrOfRows * nrOfColumns * SHUFFLE_QUALITY
-
-    for (let i = 0; i < timesToShuffle; i++) {
-      // Alternate horizontally and vertically and move a randomized amount of tiles.
-      if (shuffleDirection === 'horizontal') {
-        // Now we need to pick a random tile on the row with the empty square. We do this by
-        // randomizing columns until we find one that doesn't include the empty square.
-        let foundValidColumn = false
-        let columnOfTileToMove = 0
-        while (!foundValidColumn) {
-          let randomColumn = Math.round(Math.random() * (nrOfColumns - 1))
-          if (!(randomColumn === newEmptySquarePosition.column)) {
-            columnOfTileToMove = randomColumn
-            foundValidColumn = true
-          }
-        }
-
-        // Generate a the position on the board to make a "virtual" click.
-        clickPosition = {
-          row: newEmptySquarePosition.row,
-          column: columnOfTileToMove,
-        }
-
-        // Determine if the tile to be moved is located to the left or to the right of the
-        // empty square and move in correct direction.
-        if (clickPosition.column < newEmptySquarePosition.column) {
-          let tileToMove: TilePosition = {
-            row: clickPosition.row,
-            column: newEmptySquarePosition.column - 1,
-          }
-
-          while (tileToMove.column >= clickPosition.column) {
-            newBoardConfig[newEmptySquarePosition.row][
-              newEmptySquarePosition.column
-            ] = newBoardConfig[tileToMove.row][tileToMove.column]
-
-            tileToMove.column = tileToMove.column - 1
-            newEmptySquarePosition = {
-              row: newEmptySquarePosition.row,
-              column: newEmptySquarePosition.column - 1,
-            }
-          }
-        } else {
-          let tileToMove: TilePosition = {
-            row: clickPosition.row,
-            column: newEmptySquarePosition.column + 1,
-          }
-
-          while (tileToMove.column <= clickPosition.column) {
-            newBoardConfig[newEmptySquarePosition.row][
-              newEmptySquarePosition.column
-            ] = newBoardConfig[tileToMove.row][tileToMove.column]
-
-            tileToMove.column = tileToMove.column + 1
-            newEmptySquarePosition = {
-              row: newEmptySquarePosition.row,
-              column: newEmptySquarePosition.column + 1,
-            }
-          }
-        }
-
-        // Change direction of tile movement for next round
-        shuffleDirection = 'vertical'
-      } else if (shuffleDirection === 'vertical') {
-        let foundValidRow = false
-        let rowOfTileToMove = 0
-        while (!foundValidRow) {
-          let randomRow = Math.round(Math.random() * (nrOfRows - 1))
-          if (!(randomRow === newEmptySquarePosition.row)) {
-            rowOfTileToMove = randomRow
-            foundValidRow = true
-          }
-        }
-
-        clickPosition = {
-          row: rowOfTileToMove,
-          column: newEmptySquarePosition.column,
-        }
-
-        // Determine if the tile to be moved is located over or under the empty square
-        // and move in correct direction.
-        if (clickPosition.row < newEmptySquarePosition.row) {
-          let tileToMove: TilePosition = {
-            row: newEmptySquarePosition.row - 1,
-            column: clickPosition.column,
-          }
-
-          while (tileToMove.row >= clickPosition.row) {
-            newBoardConfig[newEmptySquarePosition.row][
-              newEmptySquarePosition.column
-            ] = newBoardConfig[tileToMove.row][tileToMove.column]
-
-            tileToMove.row = tileToMove.row - 1
-            newEmptySquarePosition = {
-              row: newEmptySquarePosition.row - 1,
-              column: newEmptySquarePosition.column,
-            }
-          }
-        } else {
-          let tileToMove: TilePosition = {
-            row: newEmptySquarePosition.row + 1,
-            column: clickPosition.column,
-          }
-
-          while (tileToMove.row <= clickPosition.row) {
-            newBoardConfig[newEmptySquarePosition.row][
-              newEmptySquarePosition.column
-            ] = newBoardConfig[tileToMove.row][tileToMove.column]
-
-            tileToMove.row = tileToMove.row + 1
-            newEmptySquarePosition = {
-              row: newEmptySquarePosition.row + 1,
-              column: newEmptySquarePosition.column,
-            }
-          }
-        }
-
-        shuffleDirection = 'horizontal'
-      }
-    }
-    newBoardConfig[newEmptySquarePosition.row][newEmptySquarePosition.column] =
-      null
-    setBoardConfig(newBoardConfig)
-    setEmptySquarePosition(newEmptySquarePosition)
-  }, [setBoardConfig, nrOfRows, nrOfColumns, invokeShuffle])
+    // Shuffle the tiles.
+    shuffleTiles(initialBoardConfig, initialEmptySquarePosition)
+  }, [setBoardConfig, nrOfRows, nrOfColumns, shuffleTiles])
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////
   // This handler is activated when the user clicks on a tile that lines up either horizonally or
@@ -377,88 +413,12 @@ function App() {
       clickPosition.row === emptySquarePosition.row ||
       clickPosition.column === emptySquarePosition.column
     ) {
-      let newBoardConfig: any[] = [...boardConfig]
-      let newEmptySquarePosition: TilePosition = { ...emptySquarePosition }
+      // Move the tiles and get the updated board config + empty square position
+      const [newBoardConfig, newEmptySquarePosition]: [any[], TilePosition] =
+        moveTiles(clickPosition, [...boardConfig], {
+          ...emptySquarePosition,
+        })
 
-      // If the tile is on the same row as the empty square we need to move horizontally.
-      if (clickPosition.row === emptySquarePosition.row) {
-        // Determine if we clicked to the left or to the right of the empty square and move in
-        // correct direction.
-        if (clickPosition.column < newEmptySquarePosition.column) {
-          let tileToMove: TilePosition = {
-            row: clickPosition.row,
-            column: newEmptySquarePosition.column - 1,
-          }
-
-          while (tileToMove.column >= clickPosition.column) {
-            newBoardConfig[newEmptySquarePosition.row][
-              newEmptySquarePosition.column
-            ] = newBoardConfig[tileToMove.row][tileToMove.column]
-
-            tileToMove.column = tileToMove.column - 1
-            newEmptySquarePosition = {
-              row: newEmptySquarePosition.row,
-              column: newEmptySquarePosition.column - 1,
-            }
-          }
-        } else {
-          let tileToMove: TilePosition = {
-            row: clickPosition.row,
-            column: newEmptySquarePosition.column + 1,
-          }
-
-          while (tileToMove.column <= clickPosition.column) {
-            newBoardConfig[newEmptySquarePosition.row][
-              newEmptySquarePosition.column
-            ] = newBoardConfig[tileToMove.row][tileToMove.column]
-
-            tileToMove.column = tileToMove.column + 1
-            newEmptySquarePosition = {
-              row: newEmptySquarePosition.row,
-              column: newEmptySquarePosition.column + 1,
-            }
-          }
-        }
-
-        // If the tile is on the same column as the emptly square we need to move vertically.
-      } else if (clickPosition.column === emptySquarePosition.column) {
-        // Determine if we clicked over or under the empty square and move in correct direction.
-        if (clickPosition.row < newEmptySquarePosition.row) {
-          let tileToMove: TilePosition = {
-            row: newEmptySquarePosition.row - 1,
-            column: clickPosition.column,
-          }
-
-          while (tileToMove.row >= clickPosition.row) {
-            newBoardConfig[newEmptySquarePosition.row][
-              newEmptySquarePosition.column
-            ] = newBoardConfig[tileToMove.row][tileToMove.column]
-
-            tileToMove.row = tileToMove.row - 1
-            newEmptySquarePosition = {
-              row: newEmptySquarePosition.row - 1,
-              column: newEmptySquarePosition.column,
-            }
-          }
-        } else {
-          let tileToMove: TilePosition = {
-            row: newEmptySquarePosition.row + 1,
-            column: clickPosition.column,
-          }
-
-          while (tileToMove.row <= clickPosition.row) {
-            newBoardConfig[newEmptySquarePosition.row][
-              newEmptySquarePosition.column
-            ] = newBoardConfig[tileToMove.row][tileToMove.column]
-
-            tileToMove.row = tileToMove.row + 1
-            newEmptySquarePosition = {
-              row: newEmptySquarePosition.row + 1,
-              column: newEmptySquarePosition.column,
-            }
-          }
-        }
-      }
       // If this is the first move of the game then set a flag in order to make sure we warn before
       // resetting the board again.
       !hasMadeFirstMove && setHasMadeFirstMove(true)
@@ -506,9 +466,6 @@ function App() {
         }
       }
 
-      newBoardConfig[newEmptySquarePosition.row][
-        newEmptySquarePosition.column
-      ] = null
       setBoardConfig(newBoardConfig)
       setEmptySquarePosition(newEmptySquarePosition)
     }
@@ -533,8 +490,10 @@ function App() {
   //////////////////////////////////////////////////////////////////////////////////////////////////////////
   const handleClickShuffle = () => {
     hasMadeFirstMove
-      ? displayWarning(() => setInvokeShuffle(true))
-      : setInvokeShuffle(true)
+      ? displayWarning(() =>
+          shuffleTiles([...boardConfig], { ...emptySquarePosition })
+        )
+      : shuffleTiles([...boardConfig], { ...emptySquarePosition })
   }
 
   const handleDecreaseNrOfRows = () => {
