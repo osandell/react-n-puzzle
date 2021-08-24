@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.js": "/react-n-puzzle/static/js/main.d48ffe5d.chunk.js",
-    "main.js.map": "/react-n-puzzle/static/js/main.d48ffe5d.chunk.js.map",
+    "main.js": "/react-n-puzzle/static/js/main.f88874da.chunk.js",
+    "main.js.map": "/react-n-puzzle/static/js/main.f88874da.chunk.js.map",
     "runtime-main.js": "/react-n-puzzle/static/js/runtime-main.8f8190c3.js",
     "runtime-main.js.map": "/react-n-puzzle/static/js/runtime-main.8f8190c3.js.map",
-    "static/js/2.d4772bee.chunk.js": "/react-n-puzzle/static/js/2.d4772bee.chunk.js",
-    "static/js/2.d4772bee.chunk.js.map": "/react-n-puzzle/static/js/2.d4772bee.chunk.js.map",
+    "static/js/2.c0a4356a.chunk.js": "/react-n-puzzle/static/js/2.c0a4356a.chunk.js",
+    "static/js/2.c0a4356a.chunk.js.map": "/react-n-puzzle/static/js/2.c0a4356a.chunk.js.map",
     "static/js/3.410d8505.chunk.js": "/react-n-puzzle/static/js/3.410d8505.chunk.js",
     "static/js/3.410d8505.chunk.js.map": "/react-n-puzzle/static/js/3.410d8505.chunk.js.map",
     "index.html": "/react-n-puzzle/index.html",
-    "static/js/2.d4772bee.chunk.js.LICENSE.txt": "/react-n-puzzle/static/js/2.d4772bee.chunk.js.LICENSE.txt"
+    "static/js/2.c0a4356a.chunk.js.LICENSE.txt": "/react-n-puzzle/static/js/2.c0a4356a.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.8f8190c3.js",
-    "static/js/2.d4772bee.chunk.js",
-    "static/js/main.d48ffe5d.chunk.js"
+    "static/js/2.c0a4356a.chunk.js",
+    "static/js/main.f88874da.chunk.js"
   ]
 }
