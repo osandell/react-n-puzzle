@@ -1,6 +1,6 @@
-interface BoardPosition {
+interface TilePosition {
   row: number
   column: number
 }
 
-export default BoardPosition
+export default TilePosition
