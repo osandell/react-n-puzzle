@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
 
 import {
   makeStyles,
@@ -184,7 +184,6 @@ function App() {
 
   const [nrOfRows, setNrOfRows] = useState<number>(2)
   const [nrOfColumns, setNrOfColumns] = useState<number>(2)
-  const [boardConfig, setBoardConfig] = useState<any[]>([])
   const [emptySquarePosition, setEmptySquarePosition] = useState<TilePosition>({
     row: nrOfRows - 1,
     column: nrOfColumns - 1,
@@ -292,7 +291,10 @@ function App() {
   // time it's created causing an infinite loop.
   //////////////////////////////////////////////////////////////////////////////////////////////////////////
   const shuffleTiles = useCallback(
-    (newBoardConfig: any[], newEmptySquarePosition: TilePosition) => {
+    (
+      newBoardConfig: any[],
+      newEmptySquarePosition: TilePosition
+    ): [any[], TilePosition] => {
       // This variable represents a "virtual" click position that is generated for each shuffle iteration.
       let clickPosition
 
@@ -366,9 +368,7 @@ function App() {
         newEmptySquarePosition.column
       ] = null
 
-      // return [newBoardConfig, newEmptySquarePosition]
-      setBoardConfig(newBoardConfig)
-      setEmptySquarePosition(newEmptySquarePosition)
+      return [newBoardConfig, newEmptySquarePosition]
     },
     [nrOfColumns, nrOfRows]
   )
@@ -376,32 +376,46 @@ function App() {
   //////////////////////////////////////////////////////////////////////////////////////////////////////////
   // This function will be called whenever the page reloads or the user changes board size.
   //////////////////////////////////////////////////////////////////////////////////////////////////////////
-  useEffect(() => {
-    // Initiate the board.
-    let initialBoardConfig: any[] = []
+  const initiateBoard = useCallback(
+    (newNrOfRows: number, newNrOfColumns: number): any[] => {
+      // Initiate the board.
+      let initialBoardConfig: any[] = []
 
-    for (let i = 0; i < nrOfRows; i++) {
-      initialBoardConfig.push([])
-      for (let j = 0; j < nrOfColumns; j++) {
-        // When we reach the last position set it to null so that it becomes an empty
-        // square allowing us to move around the pieces.
-        if (i === nrOfRows - 1 && j === nrOfColumns - 1) {
-          initialBoardConfig[i].push(null)
-        } else {
-          initialBoardConfig[i].push(i * nrOfColumns + j + 1)
+      for (let i = 0; i < newNrOfRows; i++) {
+        initialBoardConfig.push([])
+        for (let j = 0; j < newNrOfColumns; j++) {
+          // When we reach the last position set it to null so that it becomes an empty
+          // square allowing us to move around the pieces.
+          if (i === newNrOfRows - 1 && j === newNrOfColumns - 1) {
+            initialBoardConfig[i].push(null)
+          } else {
+            initialBoardConfig[i].push(i * newNrOfColumns + j + 1)
+          }
         }
       }
-    }
 
-    // Store the position of the empty square so we can keep track of it while shuffling
-    let initialEmptySquarePosition: TilePosition = {
-      row: nrOfRows - 1,
-      column: nrOfColumns - 1,
-    }
+      // Store the position of the empty square so we can keep track of it while shuffling
+      let initialEmptySquarePosition: TilePosition = {
+        row: newNrOfRows - 1,
+        column: newNrOfColumns - 1,
+      }
 
-    // Shuffle the tiles.
-    shuffleTiles(initialBoardConfig, initialEmptySquarePosition)
-  }, [setBoardConfig, nrOfRows, nrOfColumns, shuffleTiles])
+      console.log(
+        'init ' + initialBoardConfig + '   ' + initialEmptySquarePosition
+      )
+
+      // Shuffle the tiles.
+      const [newBoardConfig, newEmptySquarePosition]: [any[], TilePosition] =
+        shuffleTiles(initialBoardConfig, initialEmptySquarePosition)
+
+      // setBoardConfig(newBoardConfig)
+      // setEmptySquarePosition(newEmptySquarePosition)
+
+      return newBoardConfig
+    }
+  )
+
+  const [boardConfig, setBoardConfig] = useState<any[]>(initiateBoard(2, 2))
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////
   // This handler is activated when the user clicks on a tile that lines up either horizonally or
@@ -501,21 +515,30 @@ function App() {
       displayWarning(() => {
         setNrOfRows(nrOfRows - 1)
         setCurrentLevel(currentLevel - 1)
+        initiateBoard(nrOfRows - 1, nrOfColumns)
       })
     } else {
       setNrOfRows(nrOfRows - 1)
       setCurrentLevel(currentLevel - 1)
+      initiateBoard(nrOfRows - 1, nrOfColumns)
     }
   }
   const handleIncreaseNrOfRows = () => {
     if (hasMadeFirstMove) {
       displayWarning(() => {
-        setNrOfRows(nrOfRows + 1)
+        // setNrOfRows(nrOfRows + 1)
         setCurrentLevel(currentLevel + 1)
+        const newBoardConfig = initiateBoard(nrOfRows + 1, nrOfColumns)
+        setBoardConfig(newBoardConfig)
       })
     } else {
       setNrOfRows(nrOfRows + 1)
       setCurrentLevel(currentLevel + 1)
+      console.log('tnroforows ' + (nrOfRows + 1))
+
+      const newBoardConfig = initiateBoard(nrOfRows + 1, nrOfColumns)
+      console.log('test ' + newBoardConfig)
+      //setBoardConfig(newBoardConfig)
     }
   }
   const handleDecreaseNrOfColumns = () => {
@@ -540,6 +563,8 @@ function App() {
       setCurrentLevel(currentLevel + 1)
     }
   }
+
+  let bc = boardConfig
 
   return (
     <ThemeProvider theme={darkTheme}>
