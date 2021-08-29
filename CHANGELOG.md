@@ -1,3 +1,10 @@
+## [1.7.3](https://github.com/osandell/react-n-puzzle/compare/v1.7.2...v1.7.3) (2021-08-29)
+
+
+### Bug Fixes
+
+* fix problem with board not suffling on pressing the shuffle button ([47d7644](https://github.com/osandell/react-n-puzzle/commit/47d7644e9589e7ebb483f660d26aa47af6f21b4a)), closes [#33](https://github.com/osandell/react-n-puzzle/issues/33)
+
 ## [1.7.2](https://github.com/osandell/react-n-puzzle/compare/v1.7.1...v1.7.2) (2021-08-22)
 
 
