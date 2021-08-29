@@ -6,17 +6,31 @@ import Button from '@material-ui/core/Button'
 import TilePosition from '../../../shared/interfaces/TilePosition.interface'
 interface Props {
   position: TilePosition
-  value: number
+  value?: number
+  hidden?: boolean
   onClick: (position: TilePosition) => void
 }
+
+// Global constants
+const TILE_SIZE = 50
+const TILE_MARGIN = 2
 
 // Define css-in-js
 const useStyles = makeStyles<Theme, Props>((theme: Theme) =>
   createStyles({
     root: (props) => ({
-      width: 45,
-      height: 50,
-      margin: 2,
+      minWidth: TILE_SIZE,
+      minHeight: TILE_SIZE,
+      width: TILE_SIZE,
+      height: TILE_SIZE,
+      margin: TILE_MARGIN,
+      // If this is a hidden tile we want it to affect the size of the containing div. Therefore
+      // we only set the positioning to absolute in case it's a visible tile.
+      position: `${props.hidden ? 'initial' : 'absolute'}`,
+      visibility: `${props.hidden ? 'hidden' : 'visible'}`,
+      left: props.position.column * (TILE_SIZE + TILE_MARGIN),
+      top: props.position.row * (TILE_SIZE + TILE_MARGIN),
+      transition: 'all 0.6s ease',
       backgroundColor: '#444',
       '&:hover': {
         backgroundColor: '#00000090',
@@ -26,9 +40,6 @@ const useStyles = makeStyles<Theme, Props>((theme: Theme) =>
           backgroundColor: '#00000090',
         },
       },
-      // We always have one button with value === null that represents the empty square,
-      // that's why we hide it.
-      visibility: `${props.value === null ? 'hidden' : 'visible'}`,
     }),
   })
 )
@@ -41,8 +52,7 @@ const Tile: FC<Props> = (props): ReactElement => {
       className={classes.root}
       onClick={() => props.onClick(props.position)}
     >
-      {/* We need some placeholder string even on the hidden button to keep the right dimensions. */}
-      {props.value === null ? '\u00A0' : props.value}
+      {props.value}
     </Button>
   )
 }

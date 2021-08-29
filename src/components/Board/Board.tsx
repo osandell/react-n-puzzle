@@ -13,43 +13,60 @@ interface Props {
 }
 
 // Define css-in-js
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles<Theme, Props>((theme: Theme) =>
   createStyles({
-    root: {
+    root: (props) => ({
       display: 'inline-flex',
+      position: 'relative',
       flexDirection: 'column',
       background: 'orange',
       borderRadius: 5,
-    },
+    }),
   })
 )
 
-const Board: FC<Props> = ({ boardConfig, handleClickTile }): ReactElement => {
-  const classes = useStyles()
+const Board: FC<Props> = (props): ReactElement => {
+  const classes = useStyles(props)
 
-  // loop through every row of the board configuration and generate a box with tiles for each
+  // Loop through every position of the board and generate a tile plus a hidden tile. The visible
+  // tiles needs to be in a one dimensional array with consistent key properties in order to be able
+  // to animate. The hidden tiles on the other hand needs to be in a 2d array in order to fill out the
+  // appropriate space for the board.
   let board = []
-  for (let i = 0; i < boardConfig.length; i++) {
-    const row = boardConfig[i]
+  let hiddenBoard = []
+  for (let i = 0; i < props.boardConfig.length; i++) {
+    const row = props.boardConfig[i]
 
     let rowTiles = []
     for (let j = 0; j < row.length; j++) {
+      row[j] !== null &&
+        board.push(
+          <Tile
+            key={row[j]}
+            position={{ row: i, column: j }}
+            value={row[j]}
+            onClick={(position: TilePosition) =>
+              props.handleClickTile(position)
+            }
+          />
+        )
       rowTiles.push(
         <Tile
           key={j}
           position={{ row: i, column: j }}
-          value={row[j]}
-          onClick={(position: TilePosition) => handleClickTile(position)}
+          hidden
+          onClick={(position: TilePosition) => props.handleClickTile(position)}
         />
       )
     }
 
-    board.push(<Box key={i}>{rowTiles}</Box>)
+    hiddenBoard.push(<Box key={i}>{rowTiles}</Box>)
   }
 
   return (
     <Box data-testid="board" className={classes.root}>
       {board}
+      {hiddenBoard}
     </Box>
   )
 }
