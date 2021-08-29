@@ -302,6 +302,8 @@ function App() {
   //////////////////////////////////////////////////////////////////////////////////////////////////////////
   const shuffleTiles = useCallback(
     (newBoardConfig: any[]): any[] => {
+      console.log(newBoardConfig)
+
       let nrOfRows = newBoardConfig.length
       let nrOfColumns = newBoardConfig[0].length
 
@@ -493,8 +495,8 @@ function App() {
   //////////////////////////////////////////////////////////////////////////////////////////////////////////
   const handleClickShuffle = () => {
     hasMadeFirstMove
-      ? displayWarning(() => shuffleTiles([...boardConfig]))
-      : shuffleTiles([...boardConfig])
+      ? displayWarning(() => setBoardConfig(shuffleTiles([...boardConfig])))
+      : setBoardConfig(shuffleTiles([...boardConfig]))
   }
 
   const handleDecreaseNrOfRows = () => {
