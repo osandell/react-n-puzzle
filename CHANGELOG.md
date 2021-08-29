@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/osandell/react-n-puzzle/compare/v1.7.3...v1.8.0) (2021-08-29)
+
+
+### Features
+
+* implement animation for moving the tiles ([4db3529](https://github.com/osandell/react-n-puzzle/commit/4db3529eae7e991b1d5f140dcec703df73221fca)), closes [#32](https://github.com/osandell/react-n-puzzle/issues/32)
+
 ## [1.7.3](https://github.com/osandell/react-n-puzzle/compare/v1.7.2...v1.7.3) (2021-08-29)
 
 
